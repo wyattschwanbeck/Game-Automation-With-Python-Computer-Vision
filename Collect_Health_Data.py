@@ -35,68 +35,79 @@ def callback(hwnd, extra):
 class Custom_Listener(Listener):    
     def __init__(self):
         
-        self.health_model = keras.models.load_model('detect_health.h5')
-        self.mana_model = keras.models.load_model('detect_mana.h5')
+        #self.health_model = keras.models.load_model('detect_health.h5')
+        #self.mana_model = keras.models.load_model('detect_mana.h5')
         self.inv_model = keras.models.load_model('Pot_Detection.h5')
+        
         #model.summary()
         self.mouse = Controller()
         self.control = pynput.keyboard.Controller()
         self.health_column_names = ["full health", "slightly hurt", "hurt", "critically hurt"]
         self.mana_column_names = ["full mana", "good mana", "low mana", "no mana"]
-        #super(Custom_Listener, self).__init__(self.on_click, self.on_move, self.on_scroll)
+        
+        self.itm_labels = [ '', 'misc',
+            'minor health','minor mana',
+            'light health','light mana',
+            'mana', 'health',
+            'greater health','greater mana',
+            'super health','super mana',
+            'rejuv', 'full rejuv'
+            ]
+        
+        self.inv_labels = [
+            ["", "", "", "","","","","","",""],
+            ["", "", "", "","","","","","",""],
+            ["", "", "", "","","","","","",""],
+            ["", "", "", "","","","","","",""]
+            ]
         
         self.filename = "training_data/training_environment.npy"
         
         
         if os.path.isfile(self.filename):
             print('File exists, loading previous data!')
-            self.training_data = list(np.load(self.filename, allow_pickle=True))
+            self.training_data = list(np.load(self.filename, allow_pickle = True))
         else:
             print('File does not exist, starting fresh!')
             self.training_data = []
         
         
 
-    def collect_ss(self):
+    def collect_ss(self, inv_labels):
+        
             #while True:
             screens = [0,0]
             win32gui.EnumWindows(callback, screens)
             
             with mss.mss() as sct:
-                    inv_labels = [["minor health", "minor health", "minor mana", "minor mana", "super mana", "misc", "misc", "misc", "misc", "misc"],
-                                  ["light health", "light health", "light mana", "light mana",  "super mana", "misc", "misc", "misc", "misc", "misc"],
-                                  ["health", "health", "mana", "mana", "super health", "misc", "misc", "misc", "misc", "misc"],
-                                  ["greater health", "greater health", "greater mana", "greater mana", "super health", "misc", "misc", "misc", "misc", "misc"]]
-
-                                
-
                     monitor = {"top": screens[0][1], "left":screens[0][0], "width": screens[1][0], "height": screens[1][1]}                
                     sct_img = sct.grab(monitor)
                     
                     sct_img = np.array(sct_img)
-                   
                     screen = cv2.cvtColor(sct_img, cv2.IMREAD_GRAYSCALE)
+                    screen = self.__adjusted_capture__(screen, 419,317,113,287)
                     #screen = cv2.resize(sct_img, (50,40))
-                    if len(self.training_data)%100==0:
-                        print(len(self.training_data))
-                    screen = screen[315:435, 422:712, :]
-                    #self.training_data.append([np.array(screen),"no mana"])
+                    print(len(self.training_data))
+                    #screen = screen[317:432, 421:713, :]
+                    screen = cv2.resize(screen,(300,120))
+                    cv2.imshow('full screen', screen)
                     inv_x_coor = 0
                     
-                    for i in range(0, 290, 29):
-                        if i+29 <= 290:
+                    for i in range(0, 300, 30):
+                        
+                        if i+30 <= 300:
 
                             inv_y_coor = 0
                             for iy in range(0, 120,30):
-                                #cv2.imshow('test image {}'.format(inv_labels[inv_y_coor][inv_x_coor]), np.array(screen[int(iy):int(iy+30), int(i):int(i+29),:]))
-                                #self.training_data.append([np.array(screen[int(iy):int(iy+30), int(i):int(i+29),:]),inv_labels[inv_y_coor][inv_x_coor]])
+                                #cv2.imshow('test image {},{}'.format(inv_y_coor,inv_x_coor), np.array(screen[int(iy):int(iy+30), int(i):int(i+30),:]))
+                                self.training_data.append([np.array(screen[int(iy):int(iy+30), int(i):int(i+30),:]),inv_labels[inv_y_coor][inv_x_coor]])
                                 inv_y_coor +=1
                             inv_x_coor +=1
 
                     
 
-                    if len(self.training_data)%20000 == 0:
-                        np.save(self.filename,self.training_data)
+                    
+                    np.save(self.filename,self.training_data)
                             #break
     def __adjusted_capture__(self, screen, base_pixel_x, base_pixel_y, y_size, x_size):
         screen_w_adj = (screen.shape[0]/600)
@@ -109,8 +120,6 @@ class Custom_Listener(Listener):
                                 int((base_pixel_x*aspect_adj)*screen_w_adj):int((x_size*(screen.shape[1]/800)+(base_pixel_x*aspect_adj)*screen_w_adj)), :])
 
         screen = cv2.resize(screen,(x_size,y_size))
-        #cv2.imshow("test window", np.array(screen))
-        screen = np.array(screen).reshape(1,x_size,y_size,4)
 
         return screen
                     
@@ -119,43 +128,24 @@ class Custom_Listener(Listener):
         win32gui.EnumWindows(callback, screens)
         health_statuses = deque(maxlen=15)
         critical_health_count = 0
-        while True:
-            with mss.mss() as sct:
-                win32gui.EnumWindows(callback, screens)
-                monitor = {"top": screens[0][1], "left":screens[0][0], "width": screens[1][0], "height": screens[1][1]}                
-                sct_img = sct.grab(monitor)
-                
-                sct_img = np.array(sct_img)
-               
-                screen = cv2.cvtColor(sct_img, cv2.IMREAD_GRAYSCALE)
+        #while True:
+        with mss.mss() as sct:
+            win32gui.EnumWindows(callback, screens)
+            monitor = {"top": screens[0][1], "left":screens[0][0], "width": screens[1][0], "height": screens[1][1]}                
+            sct_img = sct.grab(monitor)
+            
+            sct_img = np.array(sct_img)
+           
+            screen = cv2.cvtColor(sct_img, cv2.IMREAD_GRAYSCALE)
 
-                #print(screens)
+            self.detect_inv_pot(screen)
+        return self.inv_labels
 
-                #cv2.imshow('test image', screen)
-                #break
-
-                #health_statuses.append(self.detect_health(screen))
-                #break
-                print(self.detect_mana(screen))
-                
-                health_status = self.detect_health(screen)
-                mana_status = self.detect_mana(screen)
-
-                print("health: {} | mana: {}".format(health_status, mana_status))
-                
-                #if (health_status !="critically hurt"):
-                #    critical_health_count = 0
-                #else:
-                #    critical_health_count += 1
-                    
-                #if (5 < critical_health_count):
-                    #self.chicken(screens)
-                    #break
-
-    def detect_health(self, screen): 
+    def _detect_health(self, screen): 
         #adjust for resolution neural net was trained on (800X600)
         #health screenshot is 30X90
         screen = self.__adjusted_capture__(screen, 45, 505, 90, 30)
+        screen = np.array(screen).reshape(1,90,30,4)
         
         input_array = self.health_model.predict(screen)
         
@@ -163,37 +153,32 @@ class Custom_Listener(Listener):
         
         return self.health_column_names[np.argmax(input_array)]
 
-    def detect_mana(self, screen): 
+    def _detect_mana(self, screen): 
         screen = self.__adjusted_capture__(screen, 730, 505, 90, 30)
-
+        screen = np.array(screen).reshape(1,90,30,4)
         input_array = self.mana_model.predict(screen)
         
         pick = np.argmax(input_array)
-        
         
         return self.mana_column_names[np.argmax(input_array)]
 
     def detect_inv_pot(self, screen): 
         #adjust for resolution neural net was trained on (800X600)
         #health screenshot is 30X90
-        inv_labels = [
-                    ["", "", "", "","","","","","",""],
-                    ["", "", "", "","","","","","",""],
-                    ["", "", "", "","","","","","",""],
-                    ["", "", "", "","","","","","",""]
-                    ]
 
-        screen = self.__adjusted_capture__(screen, 422, 315, 120, 290)
 
+        screen = self.__adjusted_capture__(screen, 419,317,113,287)
+        screen = cv2.resize(screen,(300,120))
+        
         inv_x_coor = 0
-        for i in range(0, 290, 29):
-            if i+29 <= 290:
-
+        for i in range(0, 300, 30):           
+            if i+30 <= 300:
                 inv_y_coor = 0
                 for iy in range(0, 120,30):
-                    #cv2.imshow('test image {}'.format(inv_labels[inv_y_coor][inv_x_coor]), np.array(screen[int(iy):int(iy+30), int(i):int(i+29),:]))
-                    #self.training_data.append([np.array(screen[int(iy):int(iy+30), int(i):int(i+29),:]),inv_labels[inv_y_coor][inv_x_coor]])
+                    inv_box = np.array(screen[int(iy):int(iy+30), int(i):int(i+30),:])
+                    input_array = self.inv_model.predict(inv_box.reshape(1,30,30,4))
                     
+                    self.inv_labels[inv_y_coor][inv_x_coor] = self.itm_labels[np.argmax(input_array)]
                     inv_y_coor +=1
                 inv_x_coor +=1
         
@@ -202,9 +187,3 @@ class Custom_Listener(Listener):
         
         #return self.mana_column_names[np.argmax(input_array)]
 
-        
-
-
-listener = Custom_Listener()
-#listener.collect_ss()
-listener.monitor_status()
