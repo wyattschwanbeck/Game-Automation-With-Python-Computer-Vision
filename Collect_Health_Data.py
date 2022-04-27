@@ -15,7 +15,7 @@ from pynput.mouse import Listener, Controller
 from pynput.keyboard import Key
 
 import win32gui
-
+# hi wat
 def callback(hwnd, extra):
     if(win32gui.GetWindowText(hwnd)=="Diablo II"):
         rect = win32gui.GetWindowRect(hwnd)
