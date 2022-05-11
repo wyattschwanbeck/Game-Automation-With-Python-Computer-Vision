@@ -16,13 +16,13 @@ dig_dropdowns = [["", "", "", "", "", "", "", "", "", ""],
 master = Tk()
 mainframe = Frame(master)
 mainframe.grid(column=0,row=0, sticky=(N,W,E,S) )
-mainframe.columnconfigure(0, weight = 10)
+mainframe.columnconfigure(0, weight = 4)
 mainframe.rowconfigure(0, weight = 4)
 #mainframe.pack(pady = 100, padx = 100)
 
 master.title("mAEGdIG")
 
-choices = ["red" ,"organge", "yellow", "green", ""]
+choices = ["red" ,"organge", "yellow", "green", "unset"]
 
 dig_labels = [["", "", "", "", "", "", "", "", "", ""],
               ["", "", "", "", "", "", "", "", "", ""],
