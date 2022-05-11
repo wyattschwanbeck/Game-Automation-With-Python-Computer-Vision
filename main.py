@@ -34,26 +34,11 @@ dig_labels = [["", "", "", "", "", "", "", "", "", ""],
               ["", "", "", "", "", "", "", "", "", ""],
               ["", "", "", "", "", "", "", "", "", ""],
               ["", "", "", "", "", "", "", "", "", ""]]
-def pass_labels():
-    labels = []
-    for r,row in enumerate(inv_labels,0):
-        labels.append([])
-        for option in row:
-            labels[r].append(str(option.get()))
 
-    listener.collect_ss(labels)
 
-def reset_labels():
-    for row in inv_labels:
-        for option in row:
-            option.set("")
-
-def set_detected_inv():
-    detected_labels = listener.monitor_status()
-
-    for r,row in enumerate(detected_labels,0):
-        for c,col in enumerate(row,0):
-            inv_labels[r][c].set(col)
+def update_colors():
+    #TODO
+    x = 0
     
 #variable = StringVar(master)
 #variable.set("one") # default value
@@ -61,6 +46,7 @@ def set_detected_inv():
 for y in range(0,10):
     for x in range(0, 10):
         dig_labels[y][x] = StringVar(master)
+        dig_labels[y][x].trace("w", update_colors())
         dig_dropdowns[y][x] = OptionMenu(master, dig_labels[y][x], *choices)
         dig_dropdowns[y][x].config(width=6)
         dig_dropdowns[y][x].grid(row=y, column=x)
