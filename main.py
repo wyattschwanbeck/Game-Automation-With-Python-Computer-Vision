@@ -1,29 +1,21 @@
 from tkinter import *
 #from Collect_Health_Data import *
-dig_dropdowns = [["", "", "", "", "", "", "", "", "", ""],
-              ["", "", "", "", "", "", "", "", "", ""],
-              ["", "", "", "", "", "", "", "", "", ""],
-              ["", "", "", "", "", "", "", "", "", ""],
-              ["", "", "", "", "", "", "", "", "", ""],
-              ["", "", "", "", "", "", "", "", "", ""],
-              ["", "", "", "", "", "", "", "", "", ""],
-              ["", "", "", "", "", "", "", "", "", ""],
-              ["", "", "", "", "", "", "", "", "", ""],
-              ["", "", "", "", "", "", "", "", "", ""]]
 
 #listener = Custom_Listener()
 
 master = Tk()
 mainframe = Frame(master)
 mainframe.grid(column=0,row=0, sticky=(N,W,E,S) )
-mainframe.columnconfigure(0, weight = 10)
+mainframe.columnconfigure(0, weight = 4)
 mainframe.rowconfigure(0, weight = 4)
 #mainframe.pack(pady = 100, padx = 100)
 
 master.title("mAEGdIG")
 
-choices = ["red" ,"organge", "yellow", "green", ""]
+choices = ["red" ,"organge", "yellow", "green", "unset"]
 
+
+# TODO convert to 10x10 of DigBox object
 dig_labels = [["", "", "", "", "", "", "", "", "", ""],
               ["", "", "", "", "", "", "", "", "", ""],
               ["", "", "", "", "", "", "", "", "", ""],
@@ -36,20 +28,33 @@ dig_labels = [["", "", "", "", "", "", "", "", "", ""],
               ["", "", "", "", "", "", "", "", "", ""]]
 
 
-def update_colors():
-    #TODO
-    x = 0
-    
-#variable = StringVar(master)
-#variable.set("one") # default value
+class DigBox (object):
+    known_color = "none" # String - red, orange, yellow, green, none
+    # etc
 
+
+
+
+def update_colors():
+    #TODO iterate through all 100 cells and update probabilities based on known values
+    # for each row of menus
+    #   for each item of row
+    #     calculate and update color of menu
+    x = 0
+
+
+option_menus = []
 for y in range(0,10):
+    new_row = []
     for x in range(0, 10):
+        # TODO access the right DigBox property instead of assigning the whole item e.g. dig_site[y][x].stringVar = StringVar(master)
         dig_labels[y][x] = StringVar(master)
         dig_labels[y][x].trace("w", update_colors())
-        dig_dropdowns[y][x] = OptionMenu(master, dig_labels[y][x], *choices)
-        dig_dropdowns[y][x].config(width=6)
-        dig_dropdowns[y][x].grid(row=y, column=x)
+        option = OptionMenu(master, dig_labels[y][x], *choices)
+        option.config(width=6)
+        option.grid(row=y, column=x)
+        new_row.append(option)
+    option_menus.append(new_row)
 
 
 class Gradient(object):
