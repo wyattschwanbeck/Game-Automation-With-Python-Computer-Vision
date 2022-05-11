@@ -53,50 +53,41 @@ for y in range(0,10):
 
 
 class Gradient(object):
-    
-    Red = 0
-    Green = 0
-    Blue = 0
-
     def __init__(self, percentSure):
+        #Provides gradient of color based on interative color scales 1-100%
+        # red, orange, yellow, and green
+        self.red = 0
+        self.green = 0
+        self.blue = 0
         red_min = 0.0 
         orange_min = .33
         yellow_min = .66
         green_min = 1
-        red = [255,0,0]
-        orange = [255, 127, 0]
-        yellow = [255,255,0]
-        green = [0,255,0]
+        red_list = [255,0,0]
+        orange_list = [255, 127, 0]
+        yellow_list = [255,255,0]
+        green_list = [0,255,0]
+
         if(percentSure<=orange_min):
-            Red = 255
-            Green= ((orange_min-percentSure)/(orange_min-red_min) * (orange[1]-red[1]))+red[1]
-            Blue = 0
+            self.red = 255
+            self.green= ((orange_min-percentSure)/(orange_min-red_min) * (orange_list[1]-red_list[1]))+red_list[1]
+            self.blue = 0
             
         elif(percentSure<yellow_min):
-            Red=255
-            Green = 255
-            Blue = ((yellow_min-percentSure)/(yellow_min-orange_min) * (yellow[2]-orange[2]))+orange[2]
+            self.red=255
+            self.green = 255
+            self.blue = ((yellow_min-percentSure)/(yellow_min-orange_min) * (yellow_list[2]-orange_list[2]))+orange_list[2]
+
         elif(percentSure<green_min):
-            Red = ((green_min-percentSure)/(green_min-yellow_min) * (green[0]-yellow[0]))+yellow[0]
-            Green= 255
-            Blue = 0
+            self.red = ((green_min-percentSure)/(green_min-yellow_min) * (green_list[0]-yellow_list[0]))+yellow_list[0]
+            self.green= 255
+            self.blue = 0
 
                 
-
-
-#capture_button = Button(master, text = "capture inventory", command=pass_labels)
-#capture_button.grid(row=5, column=1)
-
-#detect_inv = Button(master, text = "detect inventory", command=set_detected_inv)
-#detect_inv.grid(row=5, column=4)
-
-#reset_button = Button(master, text = "reset inventory", command=reset_labels)
-#reset_button.grid(row=5, column=8)
-
-
-#
-#w = OptionMenu(master, variable, "one", "two", "three")
-#w.pack()
+def _from_rgb(self):
+    """translates an rgb tuple of int to a tkinter friendly color code
+    """
+    return "#%02x%02x%02x" % (self.red, self.green, self.blue)   
 
 mainloop()
 
