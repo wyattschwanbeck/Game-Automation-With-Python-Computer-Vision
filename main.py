@@ -83,20 +83,17 @@ class Gradient(object):
         green = [0,255,0]
         if(percentSure<=orange_min):
             Red = 255
-            Green= _CalculateRGB((orange_min-percentSure)/(orange_min-red_min), red, orange, red_min, orange_min)
+            Green= ((orange_min-percentSure)/(orange_min-red_min) * (orange[1]-red[1]))+red[1]
             Blue = 0
             
         elif(percentSure<yellow_min):
             Red=255
             Green = 255
-            Blue = _CalculateColor((yellow_min-percentSure)/(yellow_min-orange_min),orange, yellow, orange_min, yellow_min)
+            Blue = ((yellow_min-percentSure)/(yellow_min-orange_min) * (yellow[2]-orange[2]))+orange[2]
         elif(percentSure<green_min):
-            Red = _CalculateColor((green_min-percentSure)/(green_min-orange_min),yellow,green,yellow_min, green_min)
+            Red = ((green_min-percentSure)/(green_min-yellow_min) * (green[0]-yellow[0]))+yellow[0]
             Green= 255
             Blue = 0
-
-    def _CalculateColor(self,percentChange, colorFrom, colorTo, colorFrom_Min, colorTo_Min):
-            
 
                 
 
