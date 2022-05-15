@@ -74,4 +74,3 @@ reset_button.grid(row=5, column=8)
 #w.pack()
 
 mainloop()
-
