@@ -1,5 +1,6 @@
 from tkinter import *
 from DigBox import *
+from PerspectiveGrid import *
 #from Collect_Health_Data import *
 
 #listener = Custom_Listener()
@@ -37,11 +38,24 @@ def update_colors(var, index, mode):
     
     x =0
 
-def update_dig_Box(var, index, mode):
-    for y in range(0,10):
-        for x in range(0, 10):
-            dig_box[y][x].known_color = dig_labels[y][x].get()
+def update_dig_Box():#var, index, mode):
+     capture = PerspectiveGrid()
+     for y in range(0,10):
+         for x in range(0,10):
+             dig_labels[y][x].set("unset")
+             dig_box[y][x].known_color = "unset"
+
+     for matchKey in capture.Matches.keys():
+        for coord in capture.Matches[matchKey]:
+            x = min(int(coord[0]),9)
+            y= min(int(coord[1]),9)
+            dig_labels[y][x].set(matchKey)
+            print(matchKey)
+            dig_labels[y][x].set(matchKey)
+            dig_box[y][x].known_color =matchKey
             option_menus[y][x].config(background=dig_box[y][x].GetButtonColor())
+    
+            
     
 
 
@@ -62,9 +76,11 @@ for y in range(0,10):
         new_dig_row.append(DigBox())
     option_menus.append(new_row)
 
-for y in range(0,10):
-    for x in range(0, 10):
-        dig_labels[y][x].trace("w", update_dig_Box)
+capture_button = Button(master, text = "capture inventory", command=update_dig_Box)
+capture_button.grid(row=11, column=1)
+#for y in range(0,10):
+#    for x in range(0, 10):
+        #dig_labels[y][x].trace("w", update_dig_Box)
 
 
 
