@@ -1,1 +1,2 @@
-GRIDS ARE FUN AND SO IS PYTHON
+# OpenCV & TKinter UI For Automation
+Applying concepts in computer vision to detect things.
